@@ -1,51 +1,200 @@
 # Contributing to AlgoBuddy
 
-Thank you for considering contributing to this project! ❤️
+Thank you for your interest in contributing to **AlgoBuddy**!  
+We welcome and appreciate contributions from the community to help make this project better.
 
-We welcome contributions in the form of:
+---
 
-- Bug fixes 🐛
-- New Algorithm Visualizers ✨
-- UI/UX Improvements 🎨
-- Documentation 📚
+## ↪️ Table of Contents
 
-## Getting Started
+- [Contribution Areas](#contribution-areas)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Pull Request Guidelines](#pull-request-guidelines)
+- [Reporting Issues](#reporting-issues)
 
-1. Fork the repository
-2. Clone your fork
+---
+
+## ↪️ Contribution Areas
+
+We accept contributions in the following areas:
+
+| Area                   | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| **Bug Fixes**          | Resolve existing bugs and issues                  |
+| **UI/UX Improvements** | Enhance responsiveness, accessibility, and design |
+| **New Visualizers**    | Add new DSA visualizers and animations            |
+| **Documentation**      | Improve guides, README, and contributor docs      |
+| **Performance**        | Optimize application performance and efficiency   |
+| **Theme Enhancements** | Improve dark/light mode experience                |
+
+Feel free to suggest new contribution ideas by opening an issue first.
+
+---
+
+## ↪️ Tech Stack
+
+- **Framework**: Next.js (App Router)
+- **Library**: React.js
+- **Styling**: Tailwind CSS
+- **Language**: JavaScript
+
+---
+
+## ↪️ Getting Started
+
+Follow these steps to set up the project locally.
+
+### 1. Fork the Repository
+
+Click the **Fork** button at the top-right corner of this repository.
+
+### 2. Clone Your Fork
 
 ```bash
 git clone https://github.com/your-username/AlgoBuddy.git
 ```
 
-3. Create a new branch
+### 3. Navigate to the Project Directory
 
 ```bash
-git checkout -b feature-name
+cd AlgoBuddy
 ```
 
-4. Make your changes
-5. Commit your changes
+### 4. Install Dependencies
 
 ```bash
-git commit -m "Added: your feature description"
+npm install
 ```
 
-6. Push to GitHub
+### 5. Start the Development Server
 
 ```bash
-git push origin feature-name
+npm run dev
 ```
 
-7. Open a Pull Request
+The application will start locally at:
 
-# Guidelines
+```bash
+http://localhost:3000
+```
 
-1. Follow clean code practices
-2. Proper commit messages
-3. Test your code before PR
-4. No plagiarism in blog content
+---
 
-## Happy Contributing! 🚀
+## ↪️ Development Workflow
 
-Made with ❤️ by Sohan Rout
+Follow the workflow below while contributing to the project.
+
+### 1. Create a New Branch
+
+Create a separate branch before making any changes.
+
+#### Syntax
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+#### Example
+
+```bash
+git checkout -b fix/navbar-responsive-issue
+```
+
+
+### 2. Make Your Changes
+
+You can now start working on:
+
+- Bug fixes
+- UI/UX improvements
+- Documentation updates
+- Performance enhancements
+- New visualizers
+
+
+
+### 3. Commit Your Changes
+
+Write clear and meaningful commit messages.
+
+#### Syntax
+
+```bash
+git commit -m "type: short-description"
+```
+
+#### Example
+
+```bash
+git commit -m "fix: improve navbar responsiveness"
+```
+
+#### Recommended Commit Types
+
+| Type       | Purpose                  |
+| ---------- | ------------------------ |
+| `feat`     | New feature              |
+| `fix`      | Bug fix                  |
+| `docs`     | Documentation updates    |
+| `style`    | UI/styling changes       |
+| `refactor` | Code improvements        |
+| `perf`     | Performance optimization |
+
+### 4. Push Your Changes
+
+Push your branch to your forked repository.
+
+```bash
+git push origin feature/your-branch-name
+```
+
+### 5. Open a Pull Request
+
+After pushing your changes:
+
+1. Open your fork on GitHub
+2. Click **Compare & Pull Request**
+3. Add a clear title and description
+4. Submit the pull request
+
+---
+
+## ↪️ Pull Request Guidelines
+
+Before submitting a PR:
+
+- Ensure the project runs correctly
+- Test changes on multiple screen sizes
+- Follow clean coding practices
+- Avoid unnecessary files
+- Use meaningful commit messages
+
+---
+
+## ↪️ Reporting Issues
+
+When creating issues, include:
+
+- Clear title
+- Proper explanation
+- Reproduction steps
+- Screenshots if applicable
+
+---
+
+## ↪️ Need Help?
+
+If you need help while contributing:
+
+- Open an issue
+- Start a discussion
+- Ask questions in the community
+
+We're happy to help new contributors.
+
+---
+## ↪️ Thank You
+
+Thank you for contributing to AlgoBuddy 💙
