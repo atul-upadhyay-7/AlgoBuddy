@@ -2,6 +2,12 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiMail, FiMessageSquare, FiSend } from "react-icons/fi";
+import dynamic from "next/dynamic";
+
+const Turnstile = dynamic(
+  () => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile),
+  { ssr: false },
+);
 
 const ContactSupportPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +21,7 @@ const ContactSupportPopup = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
   const popupRef = useRef(null);
 
   // Close popup when clicking outside
@@ -45,16 +52,21 @@ const ContactSupportPopup = () => {
     setError("");
 
     try {
+      if (!captchaToken) {
+        throw new Error("Please complete the captcha");
+      }
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captchaToken }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message || "Failed to send message");
       }
 
       setIsSubmitted(true);
@@ -64,6 +76,7 @@ const ContactSupportPopup = () => {
         message: "",
         subject: "Support Request",
       });
+      setCaptchaToken(null);
 
       // Reset form after 3 seconds
       setTimeout(() => {
@@ -229,7 +242,7 @@ const ContactSupportPopup = () => {
                             >
                               Message
                             </label>
-                            <textarea
+                          <textarea
                               id="message"
                               name="message"
                               rows="4"
@@ -241,9 +254,15 @@ const ContactSupportPopup = () => {
                             ></textarea>
                           </div>
                         </div>
+                        <div className="mt-4 flex justify-center">
+                          <Turnstile
+                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                            onSuccess={(token) => setCaptchaToken(token)}
+                          />
+                        </div>
                         <button
                           type="submit"
-                          disabled={isLoading}
+                          disabled={isLoading || !captchaToken}
                           className="mt-6 w-full bg-udemy-purple hover:bg-udemy-purple-dark text-white py-3 px-4 rounded font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                           {isLoading ? (
