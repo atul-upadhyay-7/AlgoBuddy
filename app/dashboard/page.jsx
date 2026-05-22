@@ -11,19 +11,20 @@ import { trackActivity } from "@/lib/activity";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, loading } = useUser();
   const [modules, setModules] = useState([]);
   const [progress, setProgress] = useState({});
   const [showAllCompleted, setShowAllCompleted] = useState(false);
 
   useEffect(() => {
+    if (loading) return;
     if (!user) {
       router.push("/login");
     } else {
       fetchModules();
       trackActivity(user.id, "site_visit");
     }
-  }, [user]);
+  }, [user, loading]);
 
   async function fetchModules() {
     const { data: modulesData, error: modulesError } = await supabase

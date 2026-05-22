@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useUser } from "@/app/contexts/UserContext";
 
 const Turnstile = dynamic(
   () => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile),
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState(null);
   const router = useRouter();
+  const { setUser } = useUser();
 
   const handleAuth = async (event) => {
     event?.preventDefault();
@@ -32,7 +34,6 @@ export default function LoginPage() {
       if (!captchaToken) throw new Error("Please complete captcha");
 
       if (isLogin) {
-        // Perform login server-side via API route (captcha + auth)
         const res = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -44,19 +45,23 @@ export default function LoginPage() {
           }),
         });
         const data = await res.json();
-        if (!data.success)
-          throw new Error(data.message || "Login failed");
+        if (!data.success) throw new Error(data.message || "Login failed");
 
-        // Restore the session returned by the server
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        });
-        if (sessionError) throw sessionError;
+        // The API route set the session as cookies. Read the session from those
+        // cookies to hydrate the client-side SDK and update the user context.
+        // Tokens are never passed through the response body.
+        const {
+          data: { user },
+          error: sessionError,
+        } = await supabase.auth.getUser();
 
+        if (sessionError || !user) {
+          throw new Error("Session could not be established. Please try again.");
+        }
+
+        setUser(user);
         router.push("/dashboard");
       } else {
-        // Signup flow remains the same
         const res = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -84,7 +89,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
     });
-    if (error) console.error("Google sign-in error:", error.message);
+    if (error) setError(error.message);
   };
 
   return (
