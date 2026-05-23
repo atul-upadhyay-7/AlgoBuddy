@@ -5,35 +5,35 @@ mentor:PankajSingh34:
   - ".*"
 
 level:beginner:
-  - "(?i).*beginner.*"
-  - "(?i).*easy.*"
-  - "(?i).*simple.*"
+  - ".*beginner.*"
+  - ".*easy.*"
+  - ".*simple.*"
 
 level:intermediate:
-  - "(?i).*medium.*"
-  - "(?i).*intermediate.*"
+  - ".*medium.*"
+  - ".*intermediate.*"
 
 level:advanced:
-  - "(?i).*hard.*"
-  - "(?i).*advanced.*"
-  - "(?i).*complex.*"
+  - ".*hard.*"
+  - ".*advanced.*"
+  - ".*complex.*"
 
 type:bug:
-  - "(?i).*bug.*"
-  - "(?i).*error.*"
-  - "(?i).*fix.*"
+  - ".*bug.*"
+  - ".*error.*"
+  - ".*fix.*"
 
 type:docs:
-  - "(?i).*documentation.*"
-  - "(?i).*docs.*"
-  - "(?i).*readme.*"
+  - ".*documentation.*"
+  - ".*docs.*"
+  - ".*readme.*"
 
 type:feature:
-  - "(?i).*feature.*"
-  - "(?i).*enhancement.*"
-  - "(?i).*add.*"
+  - ".*feature.*"
+  - ".*enhancement.*"
+  - ".*add.*"
 
 type:design:
-  - "(?i).*ui.*"
-  - "(?i).*ux.*"
-  - "(?i).*design.*"
+  - ".*ui.*"
+  - ".*ux.*"
+  - ".*design.*"
