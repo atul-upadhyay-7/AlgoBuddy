@@ -1,39 +1,22 @@
 gssoc:approved:
-  - ".*"
+  - title: ".*"
+  - body: ".*"
 
 mentor:PankajSingh34:
-  - ".*"
+  - title: ".*"
 
 level:beginner:
-  - ".*beginner.*"
-  - ".*easy.*"
-  - ".*simple.*"
-
-level:intermediate:
-  - ".*medium.*"
-  - ".*intermediate.*"
-
-level:advanced:
-  - ".*hard.*"
-  - ".*advanced.*"
-  - ".*complex.*"
+  - title: ".*beginner.*"
+  - body: ".*beginner.*"
 
 type:bug:
-  - ".*bug.*"
-  - ".*error.*"
-  - ".*fix.*"
-
-type:docs:
-  - ".*documentation.*"
-  - ".*docs.*"
-  - ".*readme.*"
+  - title: ".*bug.*"
+  - body: ".*bug.*"
 
 type:feature:
-  - ".*feature.*"
-  - ".*enhancement.*"
-  - ".*add.*"
+  - title: ".*feature.*"
+  - body: ".*feature.*"
 
-type:design:
-  - ".*ui.*"
-  - ".*ux.*"
-  - ".*design.*"
+type:docs:
+  - title: ".*docs.*"
+  - body: ".*docs.*"
