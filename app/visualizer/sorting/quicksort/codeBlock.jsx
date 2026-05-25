@@ -1,21 +1,15 @@
 'use client';
+import CodeBlock from '@/app/components/ui/CodeBlock';
 
-import AppleCodeBlock from '@/app/components/ui/AppleCodeBlock';
-
-// ─── All code examples for Quick Sort ───────────────────────────────────
 const codeExamples = {
   javascript: `// Quick Sort in JavaScript
-function quickSort(arr,left=0,right=arr.length-1){
-
-    if(left<right){
-
-        const pivotIndex=partition(arr,left,right);
-
-        quickSort(arr,left,pivotIndex-1);
-        quickSort(arr,pivotIndex+1,right);
-    }
-
-    return arr;
+function quickSort(arr, left = 0, right = arr.length - 1) {
+  if (left < right) {
+    const pivotIndex = partition(arr, left, right);
+    quickSort(arr, left, pivotIndex - 1);
+    quickSort(arr, pivotIndex + 1, right);
+  }
+  return arr;
 }
 
 function partition(arr,left,right){
@@ -50,6 +44,8 @@ console.log("After sorting:",result);`,
   python: `# Quick Sort in Python
 def quick_sort(arr,low=0,high=None):
 
+  python: `# Quick Sort in Python
+def quick_sort(arr, low=0, high=None):
     if high is None:
         high=len(arr)-1
 
@@ -80,14 +76,6 @@ def partition(arr,low,high):
 
     return i
 
-
-numbers=[10,7,8,9,1,5]
-
-print("Before sorting:",numbers)
-
-result=quick_sort(numbers.copy())
-
-print("After sorting:",result)`,
 
   java: `// Quick Sort in Java
 public class QuickSort {
@@ -160,9 +148,7 @@ public class QuickSort {
 }`,
 
   c: `// Quick Sort in C
-#include<stdio.h>
-
-void swap(int* a,int* b){
+#include <stdio.h>
 
     int temp=*a;
     *a=*b;
@@ -227,9 +213,8 @@ int main(){
 }`,
 
   cpp: `// Quick Sort in C++
-#include<iostream>
-#include<vector>
-
+#include <iostream>
+#include <vector>
 using namespace std;
 
 int partition(
@@ -295,24 +280,15 @@ int main(){
     printArray(numbers);
 
     return 0;
-}`
+}`,
 };
 
-// ─── Filenames ─────────────────────────────────────────
-const fileNames = {
-    javascript:'quickSort.js',
-    python:'quick_sort.py',
-    java:'QuickSort.java',
-    c:'quick_sort.c',
-    cpp:'quick_sort.cpp'
-};
-
-// ─── Component ─────────────────────────────────────────
-const CodeBlock = () => (
-    <AppleCodeBlock
-        codeExamples={codeExamples}
-        fileNames={fileNames}
-    />
+const QuickSortCode = () => (
+  <CodeBlock
+    variant="standard"
+    title="Quick Sort Implementation"
+    codeExamples={codeExamples}
+  />
 );
 
-export default CodeBlock;
+export default QuickSortCode;

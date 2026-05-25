@@ -1,8 +1,6 @@
 'use client';
+import CodeBlock from '@/app/components/ui/CodeBlock';
 
-import AppleCodeBlock from '@/app/components/ui/AppleCodeBlock';
-
-// ─── All code examples for Merge Sort ───────────────────────────────────
 const codeExamples = {
   javascript: `// Merge Sort in JavaScript
 function mergeSort(arr) {
@@ -40,8 +38,6 @@ const numbers = [38,27,43,3,9,82,10];
 console.log("Before sorting:", numbers);
 
 const result = mergeSort(numbers);
-
-console.log("After sorting:", result);`,
 
   python: `# Merge Sort in Python
 def merge_sort(arr):
@@ -142,12 +138,31 @@ public class MergeSort {
             System.out.print(num+" ");
         }
 
-        mergeSort(numbers);
+  c: `// Merge Sort in C
+#include <stdio.h>
+#include <stdlib.h>
 
-        System.out.print("\\nAfter sorting: ");
-
-        for(int num:numbers){
-            System.out.print(num+" ");
+void merge(int arr[], int l, int m, int r) {
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    
+    int L[n1], R[n2];
+    
+    for (i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+    
+    i = 0; j = 0; k = l;
+    
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
         }
     }
 }`,
@@ -223,9 +238,8 @@ int main(){
 }`,
 
   cpp: `// Merge Sort in C++
-#include<iostream>
-#include<vector>
-
+#include <iostream>
+#include <vector>
 using namespace std;
 
 void merge(vector<int>& arr,int l,int m,int r){
@@ -288,24 +302,15 @@ int main(){
     printArray(numbers);
 
     return 0;
-}`
+}`,
 };
 
-// ─── Filenames ──────────────────────────────────────────
-const fileNames = {
-  javascript: 'mergeSort.js',
-  python: 'merge_sort.py',
-  java: 'MergeSort.java',
-  c: 'merge_sort.c',
-  cpp: 'merge_sort.cpp',
-};
-
-// ─── Component ──────────────────────────────────────────
-const CodeBlock = () => (
-  <AppleCodeBlock
+const MergeSortCode = () => (
+  <CodeBlock
+    variant="standard"
+    title="Merge Sort Implementation"
     codeExamples={codeExamples}
-    fileNames={fileNames}
   />
 );
 
-export default CodeBlock;
+export default MergeSortCode;
