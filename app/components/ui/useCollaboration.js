@@ -42,16 +42,7 @@ async function resolveSessionIdentifier(identifier) {
   const candidate = query.split(/[&#?]/)[0].trim();
   if (!candidate) return "";
 
-  try {
-    const { sessions = [] } = await requestJson("/api/sessions");
-    const match = sessions.find((session) => {
-      const joinCode = String(session.joinCode || "").toUpperCase();
-      return session.id === candidate || joinCode === candidate.toUpperCase();
-    });
-    return match?.id || candidate;
-  } catch {
-    return candidate;
-  }
+  return candidate;
 }
 
 export function useCollaboration({

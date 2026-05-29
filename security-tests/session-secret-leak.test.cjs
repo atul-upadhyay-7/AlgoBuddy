@@ -98,7 +98,6 @@ test("getPublicCollaborationSession returns only discoverable fields", async () 
 
   const allowed = new Set([
     "id",
-    "joinCode",
     "title",
     "visibility",
     "module",
@@ -114,6 +113,71 @@ test("getPublicCollaborationSession returns only discoverable fields", async () 
       `unexpected field "${field}" found in public session view`,
     );
   }
+});
+
+test("createCollaborationSession uses a random join code independent of session ID", async () => {
+  const { createCollaborationSession } = await loadStore();
+
+  const { session } = await createCollaborationSession({
+    title: "Random join code audit",
+    visibility: "public",
+  });
+
+  const deterministicCode = session.id.replace(/_/g, "").slice(0, 8).toUpperCase();
+  assert.match(session.joinCode, /^[A-F0-9]{10}$/, "join code must be a random hex secret");
+  assert.notEqual(
+    session.joinCode,
+    deterministicCode,
+    "join code must not be derived from the session ID",
+  );
+});
+
+test("listCollaborationSessions hides join codes and excludes unlisted sessions", async () => {
+  const {
+    createCollaborationSession,
+    listCollaborationSessions,
+  } = await loadStore();
+
+  const { session: publicSession } = await createCollaborationSession({
+    title: "Anonymous list visible",
+    visibility: "public",
+  });
+  const { session: unlistedSession } = await createCollaborationSession({
+    title: "Anonymous list hidden",
+    visibility: "unlisted",
+  });
+
+  const sessions = await listCollaborationSessions();
+  const listedPublicSession = sessions.find((session) => session.id === publicSession.id);
+
+  assert.ok(listedPublicSession, "public sessions may appear in anonymous listing");
+  assert.equal(
+    listedPublicSession.joinCode,
+    undefined,
+    "anonymous session listing must not expose join codes",
+  );
+  assert.equal(
+    sessions.some((session) => session.id === unlistedSession.id),
+    false,
+    "unlisted sessions must require an explicit invite link",
+  );
+});
+
+test("joinCollaborationSession resolves random join codes without anonymous listing", async () => {
+  const {
+    createCollaborationSession,
+    joinCollaborationSession,
+  } = await loadStore();
+
+  const { session } = await createCollaborationSession({
+    title: "Secret code join",
+    visibility: "unlisted",
+  });
+
+  const joined = await joinCollaborationSession(session.joinCode);
+  assert.ok(!joined.error, "valid join code must allow joining");
+  assert.equal(joined.session.id, session.id, "join code must resolve to the session ID server-side");
+  assert.equal(joined.session.joinCode, session.joinCode, "join response may return the code to the joining user");
 });
 
 test("getCollaborationSession (internal) retains all fields including sessionSecret", async () => {

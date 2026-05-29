@@ -5,6 +5,18 @@ import {
   joinCollaborationSession,
   updateCollaborationSession,
 } from "@/lib/collaboration/sessionStore";
+import { checkRateLimit } from "@/lib/rateLimit";
+
+function getClientIp(headers) {
+  const forwardedFor = headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const first = forwardedFor.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  return "unknown";
+}
 
 function getSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -66,6 +78,15 @@ export async function GET(_request, { params }) {
 }
 
 export async function POST(request, { params }) {
+  const ip = getClientIp(request.headers);
+  const { allowed } = await checkRateLimit(`collab:join:${ip}:${params.sessionId}`);
+  if (!allowed) {
+    return Response.json(
+      { error: "Too many join attempts. Please try again shortly." },
+      { status: 429 },
+    );
+  }
+
   const body = await request.json().catch(() => ({}));
   const result = await joinCollaborationSession(params.sessionId, {
     password: body.password,
@@ -75,7 +96,7 @@ export async function POST(request, { params }) {
     return Response.json({ error: result.error }, { status: result.status || 400 });
   }
 
-  await updateCollaborationSession(params.sessionId, {
+  await updateCollaborationSession(result.session.id, {
     participantCount: Math.max(0, (result.session?.participantCount || 0) + 1),
   });
 
