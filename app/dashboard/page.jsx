@@ -20,12 +20,17 @@ export default function Dashboard() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.push("/login");
-    } else {
-      fetchModules();
-      trackActivity(user.id, "site_visit");
+      router.replace("/login");
+      return;
     }
-  }, [user, loading]);
+
+    fetchModules();
+    trackActivity(user.id, "site_visit");
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return null;
+  }
 
   async function fetchModules() {
     const { data: modulesData, error: modulesError } = await supabase
