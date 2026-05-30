@@ -677,6 +677,10 @@ const sections = [
             name: "Min Max Algorithm",
             path: "/visualizer/ai/minmax",
           },
+          {
+            name: "Alpha Beta Pruning",
+            path: "/visualizer/ai/alpha-beta-pruning",
+          },
         ],
       },
     ],
