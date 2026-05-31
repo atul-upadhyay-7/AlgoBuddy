@@ -10,6 +10,7 @@ import GraphModal from "@/app/components/models/GraphModal";
 import TutorialOverlay from "@/app/components/ui/TutorialOverlay";
 import BackToTop from "../components/ui/backtotop";
 import RecentlyViewed from "@/app/components/ui/RecentlyViewed";
+import BookmarkSection from "@/app/components/ui/BookmarkSection";
 
 export const metadata = {
   title: "Algorithm Visualizer | AlgoBuddy",
@@ -712,6 +713,8 @@ const Visualizer = () => {
       <VisualizerClient initialSections={clientSections} />
       <div className="w-full relative">
         
+        <BookmarkSection />
+        <RecentlyViewed />
         <BackToTop />
         <Footer />
       </div>

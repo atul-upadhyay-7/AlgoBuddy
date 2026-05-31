@@ -1,9 +1,9 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiSearch, FiChevronRight } from "react-icons/fi";
-
+import { FiSearch, FiChevronRight, FiBookmark } from "react-icons/fi";
+import { useBookmark } from "@/app/hooks/useBookmark";
 /* ─── colour + icon theme per DS ─── */
 const DS_THEME = {
   Array: {
@@ -449,7 +449,44 @@ function DSCard({ section, theme, delay }) {
    ═══════════════════════════════════════ */
 export default function VisualizerClient({ initialSections }) {
   const [search, setSearch] = useState("");
+  const { addBookmark, removeBookmark, isBookmarked } = useBookmark();
+const searchRef = useRef(null);
+const [searchHistory, setSearchHistory] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem("algobuddy_search_history") || "[]");
+  } catch { return []; }
+});
+const [showHistory, setShowHistory] = useState(false);
 
+// Keyboard shortcut Ctrl+K or /
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if ((e.ctrlKey && e.key === "k") || e.key === "/") {
+      e.preventDefault();
+      searchRef.current?.focus();
+      setShowHistory(true);
+    }
+    if (e.key === "Escape") {
+      searchRef.current?.blur();
+      setShowHistory(false);
+    }
+  };
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, []);
+
+// Save search history
+const handleSearchChange = (e) => {
+  const val = e.target.value;
+  setSearch(val);
+  if (val.trim().length > 2) {
+    setSearchHistory((prev) => {
+      const updated = [val, ...prev.filter((h) => h !== val)].slice(0, 5);
+      localStorage.setItem("algobuddy_search_history", JSON.stringify(updated));
+      return updated;
+    });
+  }
+};
   const filtered = useMemo(() => {
     if (!search.trim()) return initialSections;
     const q = search.toLowerCase();
@@ -524,9 +561,12 @@ export default function VisualizerClient({ initialSections }) {
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9ca3af]" />
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search algorithms and topics..."
+              ref={searchRef}
+value={search}
+onChange={handleSearchChange}
+onFocus={() => setShowHistory(true)}
+onBlur={() => setTimeout(() => setShowHistory(false), 200)}
+placeholder="Search algorithms... (Press / or Ctrl+K)"
               className="w-full h-[52px] pl-12 pr-4 rounded-2xl border border-[#e5e7eb] dark:border-[#333] bg-white dark:bg-[#1a1a1a] text-[#1a1a1a] dark:text-white placeholder-[#9ca3af] text-[15px] shadow-sm focus:outline-none focus:border-[#a435f0] focus:ring-2 focus:ring-[#a435f0]/20 transition-all"
             />
             {search && (
@@ -567,6 +607,19 @@ export default function VisualizerClient({ initialSections }) {
                             <span className="text-[14px] font-semibold text-surface-900 dark:text-white group-hover/r:text-primary transition-colors">{item.name}</span>
                             <span className="block text-[11px] text-surface-500 dark:text-surface-400">{item.ds}</span>
                           </div>
+                          <button
+  onClick={(e) => {
+    e.preventDefault();
+    isBookmarked(item.path)
+      ? removeBookmark(item.path)
+      : addBookmark({ name: item.name, path: item.path, category: item.ds });
+  }}
+  className="p-1 rounded hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+>
+  <FiBookmark
+    className={`w-4 h-4 ${isBookmarked(item.path) ? "text-purple-500 fill-purple-500" : "text-surface-300"}`}
+  />
+</button>
                           <FiChevronRight className="w-4 h-4 text-surface-300 dark:text-surface-500 group-hover/r:translate-x-1 transition-all" />
                         </Link>
                       );
