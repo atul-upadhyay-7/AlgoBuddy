@@ -7,6 +7,7 @@ import useVisualizerKeyboard from "@/app/hooks/useVisualizerKeyboard";
 import usePlayback from "@/app/hooks/usePlayback";
 import PlaybackControls from "@/app/components/ui/PlaybackControls";
 import useVisualizerReset from "@/app/hooks/useVisualizerReset";
+import { mergeSortGenerator } from "@/features/algorithms/array/mergeSortLogic";
 
 const getFontSize = (value) => {
   const len = String(value).length;
@@ -100,158 +101,91 @@ const MergeSortVisualizer = () => {
     }
   };
 
-  // Merge function for Merge Sort
-  const merge = async (arr, l, m, r) => {
-    let n1 = m - l + 1;
-    let n2 = r - m;
-
-    // Create temp arrays
-    let L = new Array(n1);
-    let R = new Array(n2);
-
-    // Copy data to temp arrays
-    for (let i = 0; i < n1; i++) L[i] = arr[l + i];
-    for (let j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
-
-    // Merge the temp arrays back into arr[l..r]
-    let i = 0,
-      j = 0,
-      k = l;
-
-    setCurrentPhase("Merge Phase");
-    setStepExplanation(`Merging two sorted subarrays: [${l}, ${m}] and [${m + 1}, ${r}].`);
-    while (i < n1 && j < n2) {
-      setCurrentIndices((prev) => ({
-        ...prev,
-        comparing: [l + i, m + 1 + j],
-        mergeStart: l,
-        mergeEnd: r,
-      }));
-      setStepExplanation(`Comparing ${L[i]} from the left subarray with ${R[j]} from the right subarray.`);
-      setComparisons((prev) => prev + 1);
-      setCurrentStep((prev) => prev + 1);
-      await cancellableDelay(1000);
-      if (!isSortingRef.current) return;
-
-      if (L[i] <= R[j]) {
-        arr[k] = L[i];
-        setStepExplanation(`Moving ${L[i]} from the left subarray into position ${k}.`);
-        i++;
-      } else {
-        arr[k] = R[j];
-        setStepExplanation(`Moving ${R[j]} from the right subarray into position ${k}.`);
-        j++;
-      }
-      setSwaps((prev) => prev + 1);
-
-      setArray([...arr]);
-      // GSAP pop animation for the merged bar
-      {
-        const bars = document.querySelectorAll(".bar");
-        const bar = bars[k];
-        if (bar) {
-          await gsap.to(bar, { scale: 1.2, duration: 0.2 });
-          await gsap.to(bar, { scale: 1.0, duration: 0.2 });
-        }
-      }
-
-      k++;
-      await cancellableDelay(1000);
-      if (!isSortingRef.current) return;
-    }
-
-    // Copy remaining elements of L[]
-    while (i < n1) {
-      arr[k] = L[i];
-      i++;
-      setArray([...arr]);
-      // GSAP pop animation for the merged bar
-      {
-        const bars = document.querySelectorAll(".bar");
-        const bar = bars[k];
-        if (bar) {
-          await gsap.to(bar, { scale: 1.2, duration: 0.2 });
-          await gsap.to(bar, { scale: 1.0, duration: 0.2 });
-        }
-      }
-      k++;
-      await cancellableDelay(1000);
-      if (!isSortingRef.current) return;
-    }
-
-    // Copy remaining elements of R[]
-    while (j < n2) {
-      arr[k] = R[j];
-      j++;
-      setArray([...arr]);
-      // GSAP pop animation for the merged bar
-      {
-        const bars = document.querySelectorAll(".bar");
-        const bar = bars[k];
-        if (bar) {
-          await gsap.to(bar, { scale: 1.2, duration: 0.2 });
-          await gsap.to(bar, { scale: 1.0, duration: 0.2 });
-        }
-      }
-      k++;
-      await cancellableDelay(1000);
-      if (!isSortingRef.current) return;
-    }
-  };
-
-  // Recursive helper with cancellation checks
-  const mergeSortHelper = async (arr, l, r, level = 0, path = []) => {
-    if (!isSortingRef.current) return;
-    if (l >= r) return;
-    const currentPath = [...path, { l, r }];
-    const m = l + Math.floor((r - l) / 2);
-    setCurrentPhase("Divide Phase");
-    setStepExplanation(`Splitting array range [${l}, ${r}] into [${l}, ${m}] and [${m + 1}, ${r}].`);
-    setCurrentIndices((prev) => ({
-      ...prev,
-      currentLevel: level,
-      recursionPath: currentPath,
-      left: l,
-      right: r,
-      mid: m,
-    }));
-    await cancellableDelay(1000);
-    if (!isSortingRef.current) return;
-    await mergeSortHelper(arr, l, m, level + 1, currentPath);
-    if (!isSortingRef.current) return;
-    await mergeSortHelper(arr, m + 1, r, level + 1, currentPath);
-    if (!isSortingRef.current) return;
-    await merge(arr, l, m, r);
-  };
-
-  // Main sort trigger
   const mergeSort = async () => {
     if (sorted || sorting || array.length === 0) return;
     isSortingRef.current = true;
     setSorting(true);
-    let arr = [...array];
-    const n = arr.length;
-    setTotalSteps(Math.floor(n * Math.ceil(Math.log2(n || 1))));
-    setCurrentStep(0);
-    await mergeSortHelper(arr, 0, arr.length - 1);
-    if (!isSortingRef.current) return;
-    setArray([...arr]);
-    setSorting(false);
-    setSorted(true);
-    setCurrentPhase("Completed");
-    setStepExplanation("Array is fully sorted.");
-    isSortingRef.current = false;
-    setCurrentIndices({
-      left: -1,
-      right: -1,
-      mergeStart: -1,
-      mergeEnd: -1,
-      comparing: [],
-      levels: [],
-      currentLevel: -1,
-      recursionPath: [],
-      mid: -1,
-    });
+
+    const generator = mergeSortGenerator(array);
+
+    for (const frame of generator) {
+      if (!isSortingRef.current) return;
+      const { type, payload } = frame;
+
+      if (type === 'init') {
+        setTotalSteps(payload.totalSteps);
+        setCurrentStep(0);
+      }
+      else if (type === 'divide') {
+        setCurrentPhase("Divide Phase");
+        setStepExplanation(`Splitting array range [${payload.l}, ${payload.r}] into [${payload.l}, ${payload.m}] and [${payload.m + 1}, ${payload.r}].`);
+        setCurrentIndices((prev) => ({
+          ...prev,
+          currentLevel: payload.level,
+          recursionPath: payload.currentPath,
+          left: payload.l,
+          right: payload.r,
+          mid: payload.m,
+        }));
+        await cancellableDelay(1000);
+      }
+      else if (type === 'merge_start') {
+        setCurrentPhase("Merge Phase");
+        setStepExplanation(`Merging two sorted subarrays: [${payload.l}, ${payload.m}] and [${payload.m + 1}, ${payload.r}].`);
+      }
+      else if (type === 'comparing') {
+        setCurrentIndices((prev) => ({
+          ...prev,
+          comparing: [payload.leftCompareIdx, payload.rightCompareIdx],
+          mergeStart: payload.l,
+          mergeEnd: payload.r,
+        }));
+        setStepExplanation(`Comparing ${payload.LVal} from the left subarray with ${payload.RVal} from the right subarray.`);
+        setComparisons(payload.comparisons);
+        setCurrentStep(payload.step);
+        await cancellableDelay(1000);
+      }
+      else if (type === 'merged' || type === 'merged_remainder') {
+        if (type === 'merged') {
+          if (payload.fromLeft) {
+            setStepExplanation(`Moving ${payload.val} from the left subarray into position ${payload.k}.`);
+          } else {
+            setStepExplanation(`Moving ${payload.val} from the right subarray into position ${payload.k}.`);
+          }
+        }
+        setSwaps(payload.merges);
+        setArray(payload.arr);
+        
+        // GSAP pop animation for the merged bar
+        const bars = document.querySelectorAll(".bar");
+        const bar = bars[payload.k];
+        if (bar) {
+          await gsap.to(bar, { scale: 1.2, duration: 0.2 });
+          await gsap.to(bar, { scale: 1.0, duration: 0.2 });
+        }
+        
+        await cancellableDelay(1000);
+      }
+      else if (type === 'completed') {
+        setArray(payload.arr);
+        setSorting(false);
+        setSorted(true);
+        setCurrentPhase("Completed");
+        setStepExplanation("Array is fully sorted.");
+        isSortingRef.current = false;
+        setCurrentIndices({
+          left: -1,
+          right: -1,
+          mergeStart: -1,
+          mergeEnd: -1,
+          comparing: [],
+          levels: [],
+          currentLevel: -1,
+          recursionPath: [],
+          mid: -1,
+        });
+      }
+    }
   };
 
   // Reset all state and cancel pending delays
